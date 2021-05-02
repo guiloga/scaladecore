@@ -1,0 +1,22 @@
+attrs==20.3.0
+cffi==1.14.5
+click==7.1.2
+cryptography==3.4.7
+Faker==5.4.0
+guilogacore-rpc @ git+https://github.com/guiloga/guilogacore-rpc@5bf9287ecc7618c027ac31eac2bb99b83dbcea91
+guirpc==0.1
+iniconfig==1.1.1
+packaging==20.8
+pika==1.1.0
+pluggy==0.13.1
+py==1.10.0
+pycparser==2.20
+PyJWT==2.0.1
+pyparsing==2.4.7
+pytest==6.2.1
+python-dateutil==2.8.1
+PyYAML==5.3.1
+scaladecore @ file:///Users/guillemlopezgarcia/repos/scaladecore
+six==1.15.0
+text-unidecode==1.3
+toml==0.10.2
