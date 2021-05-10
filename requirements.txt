@@ -3,7 +3,6 @@ cffi==1.14.5
 click==7.1.2
 cryptography==3.4.7
 Faker==5.4.0
-guilogacore-rpc @ git+https://github.com/guiloga/guilogacore-rpc@5bf9287ecc7618c027ac31eac2bb99b83dbcea91
 guirpc==0.1
 iniconfig==1.1.1
 packaging==20.8

@@ -189,12 +189,3 @@ def new_base_kwargs():
         uuid=str(uuid4()),
         created=format_dt(datetime.utcnow()), )
 
-
-def generate_token_payload(fi_uuid: str):
-    gen_time = datetime.utcnow()
-    exp_time = gen_time + timedelta(hours=3)
-    return {
-        'fi_uuid': fi_uuid,
-        'iat': int(gen_time.timestamp()),
-        'exp': int(exp_time.timestamp()),
-    }

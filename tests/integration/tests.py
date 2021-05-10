@@ -1,8 +1,7 @@
 import pytest
 
-from scaladecore.utils import encode_scalade_token
+from scaladecore.utils import encode_scalade_token, generate_token_payload
 from scaladecore.managers import ContextManager
-from tests.conftest import generate_token_payload
 
 
 class TestScaladeWSRpcClient:

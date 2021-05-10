@@ -383,16 +383,3 @@ class BrickInstanceMessageEntity(EntityContract):
             message=self._message, ))
 
         return bi_msg_d
-
-
-def entrypoint(func):
-    def wrapper(fi: FunctionInstanceEntity):
-        function_config = FunctionConfigProvider.get_config()
-
-        # TODO: serialize function instance
-        # TODO: Compare function_config inputs with function_instance inputs to test when running
-        # TODO: Compare function_config outputs with function_instance inputs to test when finished
-
-        return func(fi)
-
-    return wrapper

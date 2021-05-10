@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 import jwt
 import yaml
 import os
@@ -66,3 +66,13 @@ def decode_scalade_token(token: str) -> dict:
     except jwt.exceptions.ExpiredSignatureError:
         raise Exception(f'The function Token has been expired')
     return decoded_token
+
+
+def generate_token_payload(fi_uuid: str, ttl=7200):
+    gen_time = datetime.now()
+    exp_time = gen_time + timedelta(hours=ttl/3600)
+    return {
+        'fi_uuid': fi_uuid,
+        'iat': int(gen_time.timestamp()),
+        'exp': int(exp_time.timestamp()),
+    }

@@ -16,8 +16,7 @@ from scaladecore.variables import Variable, TextVariable, IntegerVariable, Boole
     DatetimeVariable, FileVariable
 from scaladecore.config import VariableConfig, InputConfig, OutputConfig, FunctionConfig, \
     FunctionConfigProvider
-from scaladecore.utils import encode_scalade_token, decode_scalade_token
-from tests.conftest import generate_token_payload
+from scaladecore.utils import encode_scalade_token, decode_scalade_token, generate_token_payload
 
 
 class TestAccountEntity:
