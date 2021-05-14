@@ -7,10 +7,12 @@ import re
 from typing import TypeVar
 
 from .config import FunctionConfig
+from .exceptions import BearerTokenParseError
 
 ISO_8601_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 ID_NAME_REGEX = re.compile("^[a-zA-Z-_][a-zA-Z-_0-9]*$")
 BASE64_REGEX = re.compile("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$")
+TOKEN_REGEX = re.compile("[\w\d_.+-]*$")
 
 Base64Str = TypeVar('Base64Str')
 
@@ -51,6 +53,14 @@ def get_foo_function_config() -> FunctionConfig:
     return config
 
 
+def parse_bearer_token(bearer_token):
+    match = TOKEN_REGEX.search(bearer_token)
+    if not match:
+        raise BearerTokenParseError()
+    token = match.group(0)
+    return token
+
+
 def encode_scalade_token(payload):
     private_key = os.getenv('SCALADE_PRIVATE_KEY', '').encode()
     return jwt.encode(payload, private_key, algorithm='RS256')
@@ -61,10 +71,12 @@ def decode_scalade_token(token: str) -> dict:
     try:
         decoded_token = jwt.decode(token, public_key, algorithms='RS256')
     except jwt.exceptions.DecodeError:
-        raise Exception(f'Error decoding function Token. '
-                        'This may be key missmatch or wrong key')
+        raise jwt.exceptions.DecodeError(
+            f'Error decoding function Token. '
+            f'This may be key missmatch or wrong key.')
     except jwt.exceptions.ExpiredSignatureError:
-        raise Exception(f'The function Token has been expired')
+        raise jwt.exceptions.ExpiredSignatureError(
+            'The function Token has been expired')
     return decoded_token
 
 
