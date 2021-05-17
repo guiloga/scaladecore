@@ -358,6 +358,45 @@ class VariableEntity(EntityContract):
         return var_d
 
 
+class FunctionInstanceLogMessageEntity(EntityContract):
+    LOG_LEVELS = [('debug', 'Debug'),
+                  ('info', 'Info'),
+                  ('warning', 'Warning'),
+                  ('error', 'Error')]
+
+    def __init__(self, fi_uuid: UUID, log_message: str,
+                 log_level: str = LOG_LEVELS[1][0], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._fi_uuid = fi_uuid
+        self._log_message = log_message
+        self._log_level = log_level
+
+    @classmethod
+    def create_from_dict(cls, obj_d: dict):
+        return cls(
+            uuid=UUID(obj_d.get('uuid')),
+            created=datetime.fromtimestamp(obj_d['created']),
+            fi_uuid=UUID(obj_d.get('fi_uuid')),
+            log_message=obj_d.get('log_message'),
+            log_level=obj_d.get('log_level', cls.LOG_LEVELS[1][0]),
+        )
+
+    @property
+    def as_dict(self) -> dict:
+        fi_log_message_d = super().as_dict
+        created_dt = self.get('created')
+        fi_log_message_d['created'] = created_dt.timestamp()
+        fi_log_message_d.update(dict(
+            fi_uuid=str(self._fi_uuid),
+            log_message=self._log_message,
+            log_level=self._log_level, ))
+
+        return fi_log_message_d
+
+
+##############
+# Deprecated #
+##############
 class BrickInstanceMessageEntity(EntityContract):
     def __init__(self, bi_uuid: UUID, message: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
