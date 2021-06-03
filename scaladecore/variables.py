@@ -1,5 +1,6 @@
 import base64
 from datetime import datetime
+import pickle
 import sys
 from tempfile import TemporaryFile
 from typing import Any
@@ -65,6 +66,10 @@ class Variable:
 
     def update(self, value):
         self._bytes = self.encode(value)
+    
+    def dump(self):
+        serialized = pickle.dumps(self)
+        return bytes_to_b64str(serialized)
 
     def _set_type(self, type_=None):
         if not type_:

@@ -1,4 +1,4 @@
-from .managers import ContextManager
+"""from .managers import ContextManager
 
 import os
 
@@ -10,3 +10,4 @@ def main_handler(func):
         return func(context)
 
     return execute
+"""

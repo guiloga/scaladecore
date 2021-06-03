@@ -121,6 +121,16 @@ def variable_obj_d():
 
 
 @pytest.fixture(scope='session')
+def fi_message_obj_d():
+    return dict(
+        **new_base_kwargs(),
+        fi_uuid=str(uuid4()),
+        log_message='This is a log message',
+        log_level='info',
+    )
+
+
+@pytest.fixture(scope='session')
 def brick_instance_message():
     cd = new_base_kwargs()
     cd['created'] = datetime.utcnow().timestamp()

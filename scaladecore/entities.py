@@ -4,7 +4,7 @@ import sys
 from typing import List
 from uuid import UUID, uuid4
 
-from .config import InputConfig, OutputConfig, FunctionConfigProvider, PositionConfig
+from .config import InputConfig, OutputConfig, PositionConfig
 from .exceptions import EntityFactoryError
 from .utils import parse_dt, format_dt, decode_b64str, bytes_to_b64str
 
@@ -374,8 +374,7 @@ class FunctionInstanceLogMessageEntity(EntityContract):
     @classmethod
     def create_from_dict(cls, obj_d: dict):
         return cls(
-            uuid=UUID(obj_d.get('uuid')),
-            created=datetime.fromtimestamp(obj_d['created']),
+            **cls.get_base_kwargs(obj_d),
             fi_uuid=UUID(obj_d.get('fi_uuid')),
             log_message=obj_d.get('log_message'),
             log_level=obj_d.get('log_level', cls.LOG_LEVELS[1][0]),
@@ -384,41 +383,9 @@ class FunctionInstanceLogMessageEntity(EntityContract):
     @property
     def as_dict(self) -> dict:
         fi_log_message_d = super().as_dict
-        created_dt = self.get('created')
-        fi_log_message_d['created'] = created_dt.timestamp()
         fi_log_message_d.update(dict(
             fi_uuid=str(self._fi_uuid),
             log_message=self._log_message,
             log_level=self._log_level, ))
 
         return fi_log_message_d
-
-
-##############
-# Deprecated #
-##############
-class BrickInstanceMessageEntity(EntityContract):
-    def __init__(self, bi_uuid: UUID, message: str, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._bi_uuid = bi_uuid
-        self._message = message
-
-    @classmethod
-    def create_from_dict(cls, obj_d: dict):
-        return cls(
-            uuid=UUID(obj_d.get('uuid')),
-            created=datetime.fromtimestamp(obj_d['created']),
-            bi_uuid=UUID(obj_d.get('bi_uuid')),
-            message=obj_d.get('message'),
-        )
-
-    @property
-    def as_dict(self) -> dict:
-        bi_msg_d = super().as_dict
-        created_dt = self.get('created')
-        bi_msg_d['created'] = created_dt.timestamp()
-        bi_msg_d.update(dict(
-            bi_uuid=str(self._bi_uuid),
-            message=self._message, ))
-
-        return bi_msg_d
