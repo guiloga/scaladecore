@@ -1,6 +1,6 @@
 # scaladecore
 
-### Scalade function creation core package
+### Scalade function creation core package.
 
 ____
 [![Build Status](https://www.travis-ci.com/guiloga/guilogacore-rpc.svg?branch=master)](https://www.travis-ci.com/guiloga/guilogacore-rpc)

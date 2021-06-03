@@ -1,12 +1,11 @@
-from uuid import UUID
-
-from .entities import FunctionInstanceEntity, VariableEntity
-from .rpc.client_stub import ScaladeWSRpcClient
-from .variables import Variable
-from .utils import decode_scalade_token
-
+"""from uuid import UUID
 from typing import List
 
+from .clients import ScaladeRuntimeAPIClient
+from .entities import FunctionInstanceEntity, VariableEntity
+# from .rpc.client_stub import ScaladeWSRpcClient
+from .variables import Variable
+from .utils import decode_scalade_token
 
 class ContextManager:
     __ws_client = ScaladeWSRpcClient()
@@ -54,3 +53,4 @@ class ContextManager:
             pass
         else:
             raise Exception()
+"""

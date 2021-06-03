@@ -1,17 +1,14 @@
-"""
-This module covers all unit tests about domain and
-infrastructure layers of guirpc.amqp package.
-"""
-from datetime import datetime, timedelta
+from datetime import datetime
 from tempfile import TemporaryFile
 from typing import Tuple
 from unittest import mock
 
 import pytest
 
-from scaladecore.entities import AccountEntity, BusinessEntity, UserEntity, WorkspaceEntity, \
-    FunctionTypeEntity, StreamEntity, FunctionInstanceEntity, VariableEntity, \
-    BrickInstanceMessageEntity
+from scaladecore.entities import EntityContract, AccountEntity, BusinessEntity, UserEntity, \
+    WorkspaceEntity, FunctionTypeEntity, StreamEntity, FunctionInstanceEntity, VariableEntity, \
+    FunctionInstanceLogMessageEntity
+from scaladecore.exceptions import EntityFactoryError
 from scaladecore.variables import Variable, TextVariable, IntegerVariable, BooleanVariable, \
     DatetimeVariable, FileVariable
 from scaladecore.config import VariableConfig, InputConfig, OutputConfig, FunctionConfig, \
@@ -19,120 +16,108 @@ from scaladecore.config import VariableConfig, InputConfig, OutputConfig, Functi
 from scaladecore.utils import encode_scalade_token, decode_scalade_token, generate_token_payload
 
 
+class TestEntityContract:
+    class FakeEntity(EntityContract):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+        @classmethod
+        def create_from_dict(cls, obj_d: dict):
+            return cls(
+                **cls.get_base_kwargs(obj_d),
+            )
+
+        @property
+        def as_dict(self) -> dict:
+            return super().as_dict
+
+    def test_create_entity_from_dict_error(self):
+        with pytest.raises(EntityFactoryError):
+            EntityContract.create_entity_from_dict('UnknownEntity', {})
+
+    def test_get(self):
+        fake_entity = self.FakeEntity()
+        assert fake_entity.get('created') == fake_entity._created
+
+
 class TestAccountEntity:
     @pytest.mark.usefixtures('account_obj_d')
-    def test_create_from_dict(self, account_obj_d):
+    def test_create_from_as_dict(self, account_obj_d):
         account = AccountEntity.create_from_dict(account_obj_d)
         assert isinstance(account, AccountEntity)
-
-    @pytest.mark.usefixtures('account_obj_d')
-    def test_as_dict(self, account_obj_d):
-        account = AccountEntity.create_from_dict(account_obj_d)
         assert account.as_dict == account_obj_d
 
 
 class TestBusinessEntity:
     @pytest.mark.usefixtures('business_obj_d')
-    def test_create_from_dict(self, business_obj_d):
+    def test_create_from_as_dict(self, business_obj_d):
         bs = BusinessEntity.create_from_dict(business_obj_d)
         assert isinstance(bs, BusinessEntity)
         assert isinstance(bs._master_account, AccountEntity)
-
-    @pytest.mark.usefixtures('business_obj_d')
-    def test_as_dict(self, business_obj_d):
-        bs = BusinessEntity.create_from_dict(business_obj_d)
         assert bs.as_dict == business_obj_d
 
 
 class TestUserEntity:
     @pytest.mark.usefixtures('user_obj_d')
-    def test_create_from_dict(self, user_obj_d):
+    def test_create_from_as_dict(self, user_obj_d):
         user = UserEntity.create_from_dict(user_obj_d)
         assert isinstance(user, UserEntity)
         assert isinstance(user._account, AccountEntity)
         assert isinstance(user._business, BusinessEntity)
-
-    @pytest.mark.usefixtures('user_obj_d')
-    def test_as_dict(self, user_obj_d):
-        user = UserEntity.create_from_dict(user_obj_d)
         assert user.as_dict == user_obj_d
 
 
 class TestWorkspaceEntity:
     @pytest.mark.usefixtures('workspace_obj_d')
-    def test_create_from_dict(self, workspace_obj_d):
+    def test_create_from_as_dict(self, workspace_obj_d):
         ws = WorkspaceEntity.create_from_dict(workspace_obj_d)
         assert isinstance(ws, WorkspaceEntity)
         assert isinstance(ws._business, BusinessEntity)
-
-    @pytest.mark.usefixtures('workspace_obj_d')
-    def test_as_dict(self, workspace_obj_d):
-        ws = WorkspaceEntity.create_from_dict(workspace_obj_d)
         assert ws.as_dict == workspace_obj_d
 
 
 class TestFunctionTypeEntity:
     @pytest.mark.usefixtures('function_type_obj_d')
-    def test_create_from_dict(self, function_type_obj_d):
+    def test_create_from_as_dict(self, function_type_obj_d):
         ft = FunctionTypeEntity.create_from_dict(function_type_obj_d)
         assert isinstance(ft, FunctionTypeEntity)
         assert isinstance(ft.get('account'), AccountEntity)
-
-    @pytest.mark.usefixtures('function_type_obj_d')
-    def test_as_dict(self, function_type_obj_d):
-        ft = FunctionTypeEntity.create_from_dict(function_type_obj_d)
         assert ft.as_dict == function_type_obj_d
 
 
 class TestStreamEntity:
     @pytest.mark.usefixtures('stream_obj_d')
-    def test_create_from_dict(self, stream_obj_d):
+    def test_create_from_as_dict(self, stream_obj_d):
         stream = StreamEntity.create_from_dict(stream_obj_d)
         assert isinstance(stream, StreamEntity)
         assert isinstance(stream.get('account'), AccountEntity)
-
-    @pytest.mark.usefixtures('stream_obj_d')
-    def test_as_dict(self, stream_obj_d):
-        stream = StreamEntity.create_from_dict(stream_obj_d)
         assert stream.as_dict == stream_obj_d
 
 
 class TestFunctionInstanceEntity:
     @pytest.mark.usefixtures('function_instance_obj_d')
-    def test_create_from_dict(self, function_instance_obj_d):
+    def test_create_from_as_dict(self, function_instance_obj_d):
         fi = FunctionInstanceEntity.create_from_dict(function_instance_obj_d)
         assert isinstance(fi, FunctionInstanceEntity)
         assert isinstance(fi.get('function_type'), FunctionTypeEntity)
         assert isinstance(fi.get('stream'), StreamEntity)
-
-    @pytest.mark.usefixtures('function_instance_obj_d')
-    def test_as_dict(self, function_instance_obj_d):
-        fi = FunctionInstanceEntity.create_from_dict(function_instance_obj_d)
         assert fi.as_dict == function_instance_obj_d
 
 
 class TestVariableEntity:
     @pytest.mark.usefixtures('variable_obj_d')
-    def test_create_from_dict(self, variable_obj_d):
+    def test_create_from_as_dict(self, variable_obj_d):
         variable = VariableEntity.create_from_dict(variable_obj_d)
         assert isinstance(variable, VariableEntity)
-
-    @pytest.mark.usefixtures('variable_obj_d')
-    def test_as_dict(self, variable_obj_d):
-        variable = VariableEntity.create_from_dict(variable_obj_d)
         assert variable.as_dict == variable_obj_d
 
 
-class TestBrickInstanceMessage:
-    @pytest.mark.usefixtures('brick_instance_message')
-    def test_create_from_dict(self, brick_instance_message):
-        msg = BrickInstanceMessageEntity.create_from_dict(brick_instance_message)
-        assert isinstance(msg, BrickInstanceMessageEntity)
-
-    @pytest.mark.usefixtures('brick_instance_message')
-    def test_as_dict(self, brick_instance_message):
-        msg = BrickInstanceMessageEntity.create_from_dict(brick_instance_message)
-        assert msg.as_dict == brick_instance_message
+class TestFunctionInstanceLogMessageEntity:
+    @pytest.mark.usefixtures('fi_message_obj_d')
+    def test_create_from_as_dict(self, fi_message_obj_d):
+        log_message = FunctionInstanceLogMessageEntity.create_from_dict(fi_message_obj_d)
+        assert isinstance(log_message, FunctionInstanceLogMessageEntity)
+        assert log_message.as_dict == fi_message_obj_d
 
 
 class TestVariableConfig:
@@ -285,9 +270,6 @@ class TestFileVariable:
         assert tmp_file.read() == tmpf[1]
 
 
-# TODO: Test Domain
-
-
 class TestScaladeJWToken:
     @pytest.fixture(scope='class')
     def payload(self, running_functions):
@@ -312,3 +294,8 @@ def _create_tmp_file() -> Tuple[TemporaryFile, bytes]:
     tmp_file.write(file_bytes)
 
     return tmp_file, file_bytes
+
+class TestScaladeRuntimeAPIClient:
+    def test_creation(self):
+        # TODO
+        pass

@@ -1,10 +1,11 @@
 import base64
+import configparser
 from datetime import datetime, timedelta
 import jwt
 import yaml
 import os
 import re
-from typing import TypeVar
+from typing import TypeVar, Any
 
 from .config import FunctionConfig
 from .exceptions import BearerTokenParseError
@@ -88,3 +89,31 @@ def generate_token_payload(fi_uuid: str, ttl=7200):
         'iat': int(gen_time.timestamp()),
         'exp': int(exp_time.timestamp()),
     }
+
+
+def read_pckg_conf():
+    def convert_config_to_dict(config: configparser.ConfigParser) -> dict:
+        dict_config = {}
+        for section in config.sections():
+            dict_section = {}
+            for key, value in config[section].items():
+                dict_section[key] = value
+            dict_config[section] = dict_section
+
+        return dict_config
+
+    filepath = os.path.join(os.path.dirname(
+        os.path.dirname(__file__)), 'setup.cfg')
+    with open(filepath, 'r') as file:
+        config = configparser.ConfigParser(allow_no_value=True)
+        config.read_string(file.read())
+
+    return convert_config_to_dict(config)
+
+
+def get_pckg_config_subset(subset_fields_seq: list) -> Any:
+    config = read_pckg_conf()
+    sb_conf = {} | config
+    for param in subset_fields_seq:
+        sb_conf = sb_conf[param]
+    return sb_conf
