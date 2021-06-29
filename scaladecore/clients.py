@@ -4,7 +4,7 @@ from requests.models import Response
 from requests.structures import CaseInsensitiveDict
 from typing import Tuple
 
-from .utils import decode_scalade_token, get_pckg_config_subset
+from .utils import get_pckg_config_subset
 
 
 class ScaladeRuntimeAPIClient:
@@ -19,7 +19,7 @@ class ScaladeRuntimeAPIClient:
 
     def __init__(self, token: str = None):
         self._set_base_api_url()
-        self._set_token_payload(token)
+        self._token = token
 
         self.new_http_session()
 
@@ -34,14 +34,6 @@ class ScaladeRuntimeAPIClient:
             relative_url=self.API_NAMESPACE.format(
                 version="v%s" % get_pckg_config_subset(['metadata', 'version'])[0])
         )
-
-    def _set_token_payload(self, token: str):
-        if not token:
-            self._token = os.getenv('FI_TOKEN')
-        else:
-            self._token = token
-
-        self._payload = decode_scalade_token(self._token)
 
     def _eval_response(self, resp: Response) -> Tuple[Response, bool]:
         if resp.status_code == 200:

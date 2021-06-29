@@ -1,4 +1,4 @@
-"""from .managers import ContextManager
+from .managers import ContextManager
 
 import os
 
@@ -10,4 +10,3 @@ def scalade_func(func):
         return func(context)
 
     return execute
-"""
