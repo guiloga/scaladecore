@@ -271,9 +271,9 @@ class TestFileVariable:
 
 
 class TestScaladeJWToken:
+    @pytest.mark.usefixtures('fi_uuid')
     @pytest.fixture(scope='class')
-    def payload(self, running_functions):
-        fi_uuid = running_functions[0]
+    def payload(self, fi_uuid):
         return generate_token_payload(fi_uuid)
 
     @pytest.mark.usefixtures('rsa_keys')

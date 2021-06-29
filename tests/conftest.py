@@ -188,10 +188,20 @@ vQIDAQAB
 
 
 @pytest.fixture(scope='session')
-def running_functions():
-    return ['082eef3b-6e74-4242-902d-91122abd7ab2',
-            '06b9056f-d41d-4881-8a85-bd801fccad17',
-            '03f8a39f-5a6c-4c0a-9d22-02839c52d168', ]
+def scalade_api_server():
+    os.environ['SCALADE_API_SERVER_HOST'] = 'localhost'
+    os.environ['SCALADE_API_SERVER_PORT'] = '8000'
+    os.environ['SCALADE_API_SERVER_USE_SSL'] = 'False'
+
+
+@pytest.fixture(scope='session')
+def fi_uuid():
+    return '19c1868e-9e5b-4476-b03a-2b5b41207e4f'
+
+@pytest.fixture(scope='session')
+def running_fi():
+    return ("5c1220a0-90ab-481f-99f5-92888bf4a7e1",
+            "a4c976a5-950c-459c-b3f0-c1e31ea3bf6c", )
 
 
 def new_base_kwargs():

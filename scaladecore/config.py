@@ -8,13 +8,11 @@ import yaml
 class ConfigSerializer(ABC):
     @classmethod
     @abstractmethod
-    def deserialize(cls, config_data: dict):
-        pass
+    def deserialize(cls, config_data: dict): pass
 
     @property
     @abstractmethod
-    def serialize(self) -> dict:
-        pass
+    def serialize(self) -> dict: pass
 
     @property
     def as_json(self) -> str:
