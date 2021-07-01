@@ -7,6 +7,7 @@ from uuid import UUID, uuid4
 from .config import InputConfig, OutputConfig, PositionConfig
 from .exceptions import EntityFactoryError
 from .utils import parse_dt, format_dt, decode_b64str, bytes_to_b64str
+from .variables import Variable
 
 
 class EntityContract(ABC):
@@ -100,7 +101,8 @@ class BusinessEntity(EntityContract):
     def create_from_dict(cls, obj_d):
         return cls(
             **cls.get_base_kwargs(obj_d),
-            master_account=AccountEntity.create_from_dict(obj_d.get('master_account')),
+            master_account=AccountEntity.create_from_dict(
+                obj_d.get('master_account')),
             organization_name=obj_d.get('organization_name'), )
 
     @property
@@ -186,9 +188,11 @@ class FunctionTypeEntity(EntityContract):
     @classmethod
     def create_from_dict(cls, obj_d: dict):
         inputs_d = obj_d.get('inputs')
-        inputs = [InputConfig.deserialize(it) for it in inputs_d] if inputs_d else None
+        inputs = [InputConfig.deserialize(it)
+                  for it in inputs_d] if inputs_d else None
         outputs_d = obj_d.get('outputs')
-        outputs = [OutputConfig.deserialize(ot) for ot in outputs_d] if outputs_d else None
+        outputs = [OutputConfig.deserialize(
+            ot) for ot in outputs_d] if outputs_d else None
         return cls(
             **cls.get_base_kwargs(obj_d),
             key=obj_d.get('key'),
@@ -209,7 +213,8 @@ class FunctionTypeEntity(EntityContract):
             description=self._description,
             updated=format_dt(self._updated),
             inputs=[it.serialize for it in self._inputs] if self._inputs else None,
-            outputs=[ot.serialize for ot in self._outputs] if self._outputs else None,
+            outputs=[
+                ot.serialize for ot in self._outputs] if self._outputs else None,
             account=self._account.as_dict, ))
 
         return ft_d
@@ -291,7 +296,8 @@ class FunctionInstanceEntity(EntityContract):
         completed = obj_d.get('completed')
         return cls(
             **cls.get_base_kwargs(obj_d),
-            function_type=FunctionTypeEntity.create_from_dict(obj_d.get('function_type')),
+            function_type=FunctionTypeEntity.create_from_dict(
+                obj_d.get('function_type')),
             stream=StreamEntity.create_from_dict(obj_d.get('stream')),
             position=PositionConfig.deserialize(obj_d.get('position')),
             initialized=parse_dt(initialized) if initialized else None,
@@ -307,7 +313,8 @@ class FunctionInstanceEntity(EntityContract):
             function_type=self._function_type.as_dict,
             stream=self._stream.as_dict,
             position=self._position.serialize,
-            initialized=format_dt(self._initialized) if self._initialized else None,
+            initialized=format_dt(
+                self._initialized) if self._initialized else None,
             updated=format_dt(self._updated),
             completed=format_dt(self._completed) if self._completed else None,
             status=self._status, ))
@@ -356,6 +363,15 @@ class VariableEntity(EntityContract):
             __rank__=self._rank, ))
 
         return var_d
+
+    @property
+    def to_var(self) -> Variable:
+        return Variable.create(
+            type_=self._type,
+            id_name=self._id_name,
+            bytes_=self._bytes,
+            charset=self._charset,
+        )
 
 
 class FunctionInstanceLogMessageEntity(EntityContract):

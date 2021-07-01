@@ -15,14 +15,16 @@ class Variable:
     TYPES = ('text', 'integer', 'boolean', 'datetime',
              'file')
 
-    def __init__(self, id_name: str, value: Any, charset: str = DEFAULT_CHARSET,
-                 type_: str = None):
+    def __init__(self,
+                 id_name: str,
+                 type_: str = None,
+                 bytes_: bytes = None,
+                 value: Any = None,
+                 charset: str = DEFAULT_CHARSET):
         self._id_name = id_name
-        self._value = value
-        self._charset = charset
-
-        self._bytes = self.encode(value)
         self._set_type(type_)
+        self._charset = charset
+        self._bytes = self.encode(value) if value else bytes_
 
     @property
     def id_name(self):
@@ -33,10 +35,6 @@ class Variable:
         return self.__type
 
     @property
-    def value(self):
-        return self._value
-
-    @property
     def charset(self):
         return self._charset
 
@@ -45,18 +43,27 @@ class Variable:
         return self._bytes
 
     @property
+    def value(self):
+        """
+        Wrapps decoded property
+        """
+        return self.decoded
+
+    @property
     def decoded(self) -> Any:
         return self._bytes.decode(encoding=self._charset)
 
     @classmethod
-    def create(cls, type_: str, id_name: str, value: Any, **kwargs):
+    def create(cls, type_: str, *args, **kwargs):
         """Factory function"""
         if type_ not in cls.TYPES:
-            raise Exception(f'Invalid variable type: valid ones are {cls.TYPES}')
+            raise Exception(
+                f'Invalid variable type: valid ones are {cls.TYPES}')
+
         class_name = '%sVariable' % type_.capitalize()
         var_type = getattr(sys.modules[__name__], class_name)
-        kwargs['type_'] = type_
-        return var_type(id_name, value, **kwargs)
+
+        return var_type(*args, **kwargs)
 
     def encode(self, value: Any) -> bytes:
         return value.encode(encoding=self._charset)
@@ -66,14 +73,15 @@ class Variable:
 
     def update(self, value):
         self._bytes = self.encode(value)
-    
+
     def dump(self):
         serialized = pickle.dumps(self)
         return bytes_to_b64str(serialized)
 
     def _set_type(self, type_=None):
         if not type_:
-            self.__type = self.__class__.__name__.split('Variable')[0].lower() or None
+            self.__type = self.__class__.__name__.split('Variable')[
+                0].lower() or None
         else:
             self.__type = type_
 

@@ -4,7 +4,7 @@ from requests.models import Response
 from requests.structures import CaseInsensitiveDict
 from typing import Tuple
 
-from .utils import get_pckg_config_subset
+from .utils import get_pckg_dist_version_num
 
 
 class ScaladeRuntimeAPIClient:
@@ -32,7 +32,7 @@ class ScaladeRuntimeAPIClient:
             port=os.getenv(
                 'SCALADE_API_SERVER_PORT', '8000'),
             relative_url=self.API_NAMESPACE.format(
-                version="v%s" % get_pckg_config_subset(['metadata', 'version'])[0])
+                version="v%s" % get_pckg_dist_version_num())
         )
 
     def _eval_response(self, resp: Response) -> Tuple[Response, bool]:

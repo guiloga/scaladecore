@@ -1,9 +1,10 @@
 from typing import List
 
-from scaladecore.exceptions import ContextBlockError, ContextCompleteError, ContextInitError, ContextLogError, ContextOutputError
 
 from .clients import ScaladeRuntimeAPIClient
 from .entities import FunctionInstanceEntity, VariableEntity
+from .exceptions import ContextBlockError, ContextCompleteError, ContextInitError, \
+    ContextLogError, ContextOutputError
 from .variables import Variable
 
 
@@ -81,6 +82,22 @@ class ContextManager:
             raise ContextOutputError(data)
         else:
             self._outputs = create_variables(data['outputs'])
+
+    def GetInput(self, id_name: str) -> Variable:
+        for ipt in self._inputs:
+            if ipt.get('id_name') == id_name:
+                return ipt.to_var
+
+        # todo: custom exception
+        raise Exception()
+
+    def GetOutput(self, id_name: str) -> Variable:
+        for opt in self._outputs:
+            if opt.get('id_name') == id_name:
+                return opt.to_var
+
+        # todo: custom exception
+        raise Exception()
 
 
 def create_function_instance(function_instance_data: dict) -> FunctionInstanceEntity:

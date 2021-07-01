@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import jwt
 import yaml
 import os
+from pkg_resources import get_distribution, DistributionNotFound
 import re
 from typing import TypeVar, Any
 
@@ -91,7 +92,7 @@ def generate_token_payload(fi_uuid: str, ttl=7200):
     }
 
 
-def read_pckg_conf():
+def _read_pckg_conf():
     def convert_config_to_dict(config: configparser.ConfigParser) -> dict:
         dict_config = {}
         for section in config.sections():
@@ -111,9 +112,18 @@ def read_pckg_conf():
     return convert_config_to_dict(config)
 
 
-def get_pckg_config_subset(subset_fields_seq: list) -> Any:
-    config = read_pckg_conf()
+def _get_pckg_config_subset(subset_fields_seq: list) -> Any:
+    config = _read_pckg_conf()
     sb_conf = {} | config
     for param in subset_fields_seq:
         sb_conf = sb_conf[param]
     return sb_conf
+
+
+def get_pckg_dist_version_num() -> str:
+    try:
+        dist = get_distribution('scaladecore')
+        version = dist.version
+    except DistributionNotFound:
+        version = _get_pckg_config_subset(['metadata', 'version'])
+    return version[0]

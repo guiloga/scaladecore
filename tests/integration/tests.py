@@ -82,12 +82,12 @@ class TestContextManager:
     @pytest.mark.usefixtures('fi_uuid')
     def test_Output(self, fi_uuid):
         ctx = _init_context(fi_uuid)
-        variable = Variable.create('text', 'Names', 'Guillem,Albert')
+        variable = Variable.create('text', 'Names', value='Guillem,Albert')
         ctx.Output(variable)
         assert ctx.outputs
         
         with pytest.raises(ContextOutputError):
-            var_ = Variable.create('text', 'Names', 'Guillem,Albert')
+            var_ = Variable.create('text', 'Names', value='Guillem,Albert')
             var_.dump = MagicMock(return_value="")
             ctx.Output(var_)
         assert ContextOutputError().__str__()
