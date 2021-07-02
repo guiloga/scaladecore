@@ -5,7 +5,8 @@ from uuid import uuid4
 import pytest
 
 
-from scaladecore.utils import format_dt, get_foo_function_config
+from scaladecore.utils import format_dt, get_foo_function_config, \
+    encode_scalade_token, generate_token_payload
 
 
 @pytest.fixture(scope='session', name='function_cd')
@@ -188,15 +189,9 @@ vQIDAQAB
 
 
 @pytest.fixture(scope='session')
-def scalade_api_server():
-    os.environ['SCALADE_API_SERVER_HOST'] = 'localhost'
-    os.environ['SCALADE_API_SERVER_PORT'] = '8000'
-    os.environ['SCALADE_API_SERVER_USE_SSL'] = 'False'
-
-
-@pytest.fixture(scope='session')
 def fi_uuid():
     return '19c1868e-9e5b-4476-b03a-2b5b41207e4f'
+
 
 @pytest.fixture(scope='session')
 def running_fi():
@@ -204,8 +199,18 @@ def running_fi():
             "a4c976a5-950c-459c-b3f0-c1e31ea3bf6c", )
 
 
+@pytest.mark.usefixtures('fi_uuid')
+@pytest.fixture(scope='session')
+def scalade_api_server(fi_uuid):
+    os.environ['SCALADE_API_SERVER_HOST'] = 'localhost'
+    os.environ['SCALADE_API_SERVER_PORT'] = '8000'
+    os.environ['SCALADE_API_SERVER_USE_SSL'] = 'False'
+    token = encode_scalade_token(
+        generate_token_payload(fi_uuid))
+    os.environ['SCALADE_FI_TOKEN'] = token
+
+
 def new_base_kwargs():
     return dict(
         uuid=str(uuid4()),
         created=format_dt(datetime.utcnow()), )
-

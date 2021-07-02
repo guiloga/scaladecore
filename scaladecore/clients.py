@@ -19,7 +19,7 @@ class ScaladeRuntimeAPIClient:
 
     def __init__(self, token: str = None):
         self._set_base_api_url()
-        self._token = token
+        self._token = token or os.getenv('SCALADE_FI_TOKEN')
 
         self.new_http_session()
 

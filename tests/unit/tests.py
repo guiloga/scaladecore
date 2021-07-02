@@ -115,7 +115,8 @@ class TestVariableEntity:
 class TestFunctionInstanceLogMessageEntity:
     @pytest.mark.usefixtures('fi_message_obj_d')
     def test_create_from_as_dict(self, fi_message_obj_d):
-        log_message = FunctionInstanceLogMessageEntity.create_from_dict(fi_message_obj_d)
+        log_message = FunctionInstanceLogMessageEntity.create_from_dict(
+            fi_message_obj_d)
         assert isinstance(log_message, FunctionInstanceLogMessageEntity)
         assert log_message.as_dict == fi_message_obj_d
 
@@ -192,10 +193,11 @@ class TestVariable:
 class TestTextVariable:
     @pytest.fixture(scope='class')
     def var_data(self):
-        return 'my_var', 'foo'
+        return {'id_name': 'my_var',
+                'value': 'foo'}
 
     def test_creation(self, var_data):
-        variable = TextVariable(*var_data)
+        variable = TextVariable(**var_data)
 
         assert getattr(variable, 'id_name') == 'my_var'
         assert getattr(variable, 'type') == 'text'
@@ -207,10 +209,11 @@ class TestTextVariable:
 class TestIntegerVariable:
     @pytest.fixture(scope='class')
     def var_data(self):
-        return 'my_var', 5
+        return {'id_name': 'my_var',
+                'value': 5}
 
     def test_creation(self, var_data):
-        variable = IntegerVariable(*var_data)
+        variable = IntegerVariable(**var_data)
 
         assert getattr(variable, 'id_name') == 'my_var'
         assert getattr(variable, 'type') == 'integer'
@@ -222,10 +225,11 @@ class TestIntegerVariable:
 class TestBooleanVariable:
     @pytest.fixture(scope='class')
     def var_data(self):
-        return 'my_var', True
+        return {'id_name': 'my_var',
+                'value': True}
 
     def test_creation(self, var_data):
-        variable = BooleanVariable(*var_data)
+        variable = BooleanVariable(**var_data)
 
         assert getattr(variable, 'id_name') == 'my_var'
         assert getattr(variable, 'type') == 'boolean'
@@ -237,16 +241,17 @@ class TestBooleanVariable:
 class TestDatetimeVariable:
     @pytest.fixture(scope='class')
     def var_data(self):
-        return 'my_var', datetime.utcnow()
+        return {'id_name': 'my_var',
+                'value': datetime.utcnow()}
 
     def test_creation(self, var_data):
-        variable = DatetimeVariable(*var_data)
+        variable = DatetimeVariable(**var_data)
 
         assert getattr(variable, 'id_name') == 'my_var'
         assert getattr(variable, 'type') == 'datetime'
-        assert getattr(variable, 'value') == var_data[1]
+        assert getattr(variable, 'value') == var_data['value']
         assert isinstance(variable.bytes, bytes)
-        assert variable.decoded == var_data[1]
+        assert variable.decoded == var_data['value']
 
 
 class TestFileVariable:
@@ -256,14 +261,14 @@ class TestFileVariable:
 
     @pytest.fixture(scope='class')
     def var_data(self, tmpf):
-        return 'my_var', tmpf[0]
+        return {'id_name': 'my_var',
+                'value': tmpf[0]}
 
     def test_creation(self, tmpf, var_data):
-        variable = FileVariable(*var_data)
+        variable = FileVariable(**var_data)
 
         assert getattr(variable, 'id_name') == 'my_var'
         assert getattr(variable, 'type') == 'file'
-        assert getattr(variable, 'value') == var_data[1]
         assert isinstance(variable.bytes, bytes)
         tmp_file = variable.decoded
         tmp_file.seek(0)
@@ -294,6 +299,7 @@ def _create_tmp_file() -> Tuple[TemporaryFile, bytes]:
     tmp_file.write(file_bytes)
 
     return tmp_file, file_bytes
+
 
 class TestScaladeRuntimeAPIClient:
     def test_creation(self):

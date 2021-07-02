@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock
+from uuid import uuid4
 
-from scaladecore.exceptions import ContextBlockError, ContextCompleteError, ContextOutputError
+from scaladecore.exceptions import ContextBlockError, ContextCompleteError, ContextInitError, ContextLogError, ContextOutputError
 from scaladecore.entities import FunctionInstanceEntity, VariableEntity
 from scaladecore.managers import ContextManager
 from scaladecore.variables import Variable
@@ -11,12 +12,10 @@ from scaladecore.utils import encode_scalade_token, generate_token_payload
 
 
 class TestScaladeRuntimeAPIClient:
-    @pytest.mark.usefixtures('fi_uuid')
+    @pytest.mark.usefixtures('scalade_api_server')
     @pytest.fixture(scope='class')
-    def api_client(self, fi_uuid):
-        token = encode_scalade_token(
-            generate_token_payload(fi_uuid))
-        api_client = ScaladeRuntimeAPIClient(token)
+    def api_client(self, scalade_api_server):
+        api_client = ScaladeRuntimeAPIClient()
         return api_client
 
     def test_retrieve_fi_context(self, api_client):
@@ -54,17 +53,25 @@ class TestContextManager:
             assert isinstance(ipt, VariableEntity)
         assert isinstance(ctx._ContextManager__client, ScaladeRuntimeAPIClient)
 
+        with pytest.raises(ContextInitError):
+            _ = _init_context(str(uuid4()))
+        assert ContextInitError({'error': 'detail ..'}).__str__()
+
     @pytest.mark.usefixtures('fi_uuid')
     def test_Log(self, fi_uuid):
         ctx = _init_context(fi_uuid)
         ctx.Log('Fake log message')
+
+        with pytest.raises(ContextLogError):
+            ctx.Log(None)
+        assert ContextLogError().__str__()
 
     @pytest.mark.usefixtures('running_fi')
     def test_Block(self, running_fi):
         ctx = _init_context(running_fi[0])
         ctx.Block()
         assert ctx.fi.get('status') == 'blocked'
-        
+
         with pytest.raises(ContextBlockError):
             ctx.Block()
         assert ContextBlockError().__str__()
@@ -74,7 +81,7 @@ class TestContextManager:
         ctx = _init_context(running_fi[1])
         ctx.Complete()
         assert ctx.fi.get('status') == 'completed'
-        
+
         with pytest.raises(ContextCompleteError):
             ctx.Complete()
         assert ContextCompleteError().__str__()
@@ -85,7 +92,7 @@ class TestContextManager:
         variable = Variable.create('text', 'Names', value='Guillem,Albert')
         ctx.Output(variable)
         assert ctx.outputs
-        
+
         with pytest.raises(ContextOutputError):
             var_ = Variable.create('text', 'Names', value='Guillem,Albert')
             var_.dump = MagicMock(return_value="")
