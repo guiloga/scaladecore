@@ -24,19 +24,31 @@ that current stable versions of docker and docker-compose are installed.
 
 Run all **unit** and **integration** tests:
 
-```
+```bash
 docker-compose run test
 ```
 
 Optionally, run code static analysis (with flake8):
 
-```
+```bash
 docker-compose run static_analysis
+```
+
+## Tooling
+For style guide and code formatting is used:
+**flake8**, **autopep8**
+
+### Useful commands
+```bash
+flake8 --max-complexity 10 --ignore E501
+```
+```bash
+autopep8 -i <file>
 ```
 
 ### Build
 
-```
+```bash
 # Create setup.py file:
 touch setup.py
 echo "import setuptools
@@ -47,8 +59,7 @@ python setup.py bdist --format=zip
 ```
 
 In development create a link file which associates source code with your interpreter site-packages directory:
-
-```
+```bash
 pip install --editable .
 ```
 
@@ -62,8 +73,6 @@ Upload it yo PyPi with
 ## Authors
 
 * **Guillem López Garcia** - [guiloga](https://github.com/guiloga)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ## License
 

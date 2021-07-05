@@ -14,7 +14,7 @@ from .exceptions import BearerTokenParseError
 ISO_8601_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 ID_NAME_REGEX = re.compile("^[a-zA-Z-_][a-zA-Z-_0-9]*$")
 BASE64_REGEX = re.compile("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$")
-TOKEN_REGEX = re.compile("[\w\d_.+-]*$")
+TOKEN_REGEX = re.compile("[A-Za-z_.+-]*$")
 
 Base64Str = TypeVar('Base64Str')
 
@@ -74,8 +74,8 @@ def decode_scalade_token(token: str) -> dict:
         decoded_token = jwt.decode(token, public_key, algorithms='RS256')
     except jwt.exceptions.DecodeError:
         raise jwt.exceptions.DecodeError(
-            f'Error decoding function Token. '
-            f'This may be key missmatch or wrong key.')
+            'Error decoding function Token. '
+            'This may be key missmatch or wrong key.')
     except jwt.exceptions.ExpiredSignatureError:
         raise jwt.exceptions.ExpiredSignatureError(
             'The function Token has been expired')
@@ -84,7 +84,7 @@ def decode_scalade_token(token: str) -> dict:
 
 def generate_token_payload(fi_uuid: str, ttl=7200):
     gen_time = datetime.now()
-    exp_time = gen_time + timedelta(hours=ttl/3600)
+    exp_time = gen_time + timedelta(hours=ttl / 3600)
     return {
         'fi_uuid': fi_uuid,
         'iat': int(gen_time.timestamp()),

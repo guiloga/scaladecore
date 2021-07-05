@@ -114,3 +114,6 @@ media/
 # other
 test_config.ini
 sh/
+tasks.txt
+myfunction/
+projects/

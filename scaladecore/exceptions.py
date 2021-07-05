@@ -24,29 +24,29 @@ class BaseContextError(Exception):
 
 class ContextInitError(BaseContextError):
     def __str__(self):
-        return ("Unable to initialize properly the ContextManager object. " +
-                super().__str__())
+        return ("Unable to initialize properly the ContextManager object. %s"
+                % super().__str__())
 
 
 class ContextLogError(BaseContextError):
     def __str__(self):
-        return ("An error occurred while creating a log message. " +
-                super().__str__())
+        return ("An error occurred while creating a log message. %s"
+                % super().__str__())
 
 
 class ContextBlockError(BaseContextError):
     def __str__(self):
-        return ("An error occurred on block function instance. " +
-                super().__str__())
+        return ("An error occurred on block function instance. %s"
+                % super().__str__())
 
 
 class ContextCompleteError(BaseContextError):
     def __str__(self):
-        return ("An error occurred on complete function instance. " +
-                super().__str__())
+        return ("An error occurred on complete function instance. %s"
+                % super().__str__())
 
 
 class ContextOutputError(BaseContextError):
     def __str__(self):
-        return ("An error occurred while creating an output. " +
-                super().__str__())
+        return ("An error occurred while creating an output. %s"
+                % super().__str__())
